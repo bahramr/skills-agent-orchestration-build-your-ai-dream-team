@@ -1,0 +1,32 @@
+{
+  "projects": [
+    {
+      "name": "Docs Navigation Tune-Up",
+      "owner": "@avery",
+      "status": "On track",
+      "recentActivity": "Reviewed the sidebar labels and opened follow-up issues for first-time contributor feedback.",
+      "priority": "High"
+    },
+    {
+      "name": "Issue Triage Helper",
+      "owner": "@sana",
+      "status": "At risk",
+      "recentActivity": "Found a flaky label sync job that needs a maintainer decision before rollout.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Release Notes Automation",
+      "owner": "@diego",
+      "status": "Blocked",
+      "recentActivity": "Paused implementation while the team confirms the changelog format for community releases.",
+      "priority": "High"
+    },
+    {
+      "name": "Good First Issue Cleanup",
+      "owner": "@lin",
+      "status": "Shipped",
+      "recentActivity": "Published the refreshed issue list and thanked contributors in the weekly update.",
+      "priority": "Low"
+    }
+  ]
+}

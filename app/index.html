@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Pulse</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Project Pulse</h1>
+    <p>Contributor-friendly project status at a glance.</p>
+  </header>
+
+  <main>
+    <section class="dashboard" aria-labelledby="dashboard-heading" aria-live="polite">
+      <h2 id="dashboard-heading">Active projects</h2>
+    </section>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const dashboard = document.querySelector('.dashboard');
+      const statusClassMap = {
+        'On track': 'status--on-track',
+        'At risk': 'status--at-risk',
+        'Blocked': 'status--blocked',
+        'Shipped': 'status--shipped'
+      };
+      const priorityClassMap = {
+        High: 'priority--high',
+        Medium: 'priority--medium',
+        Low: 'priority--low'
+      };
+
+      const valueOrPlaceholder = (value) => {
+        if (typeof value !== 'string') {
+          return '—';
+        }
+
+        const trimmedValue = value.trim();
+        return trimmedValue === '' ? '—' : trimmedValue;
+      };
+
+      const appendMessage = (message) => {
+        const messageElement = document.createElement('p');
+        messageElement.className = 'dashboard-message';
+        messageElement.textContent = message;
+        dashboard.appendChild(messageElement);
+      };
+
+      const appendLabeledText = (card, labelText, valueText) => {
+        const row = document.createElement('p');
+        const label = document.createElement('strong');
+        label.textContent = `${labelText}: `;
+        const value = document.createElement('span');
+        value.textContent = valueText;
+
+        row.append(label, value);
+        card.appendChild(row);
+      };
+
+      const createProjectCard = (project) => {
+        const name = valueOrPlaceholder(project.name);
+        const owner = valueOrPlaceholder(project.owner);
+        const status = valueOrPlaceholder(project.status);
+        const recentActivity = valueOrPlaceholder(project.recentActivity);
+        const priority = valueOrPlaceholder(project.priority);
+
+        const card = document.createElement('article');
+        card.className = 'project-card';
+
+        const title = document.createElement('h3');
+        title.textContent = name;
+        card.appendChild(title);
+
+        appendLabeledText(card, 'Owner', owner);
+
+        const statusRow = document.createElement('p');
+        const statusLabel = document.createElement('strong');
+        statusLabel.textContent = 'status: ';
+        const statusBadge = document.createElement('span');
+        statusBadge.className = ['status', statusClassMap[status]].filter(Boolean).join(' ');
+        statusBadge.setAttribute('role', 'status');
+        statusBadge.setAttribute('aria-label', `Project status: ${status}`);
+        statusBadge.textContent = status;
+        statusRow.append(statusLabel, statusBadge);
+        card.appendChild(statusRow);
+
+        appendLabeledText(card, 'recentActivity', recentActivity);
+
+        const priorityRow = document.createElement('p');
+        const priorityLabel = document.createElement('strong');
+        priorityLabel.textContent = 'priority: ';
+        const priorityPill = document.createElement('span');
+        priorityPill.className = ['priority', priorityClassMap[priority]].filter(Boolean).join(' ');
+        priorityPill.textContent = priority;
+        priorityRow.append(priorityLabel, priorityPill);
+        card.appendChild(priorityRow);
+
+        return card;
+      };
+
+      fetch('project-data.json')
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Unable to load project-data.json: ${response.status} ${response.statusText}`);
+          }
+
+          return response.json();
+        })
+        .then((data) => {
+          const projects = Array.isArray(data.projects) ? data.projects : [];
+
+          if (projects.length === 0) {
+            appendMessage('No projects yet. Add entries to project-data.json to populate the dashboard.');
+            return;
+          }
+
+          projects.forEach((project) => {
+            dashboard.appendChild(createProjectCard(project || {}));
+          });
+        })
+        .catch((error) => {
+          appendMessage('Project data could not be loaded. Open this dashboard with the Run Project Pulse Dashboard launch config so project-data.json is served correctly.');
+          console.error('Project Pulse could not load project-data.json. Open this page via the Run Project Pulse Dashboard launch config.', error);
+        });
+    });
+  </script>
+</body>
+</html>
